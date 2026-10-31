@@ -1,0 +1,39 @@
+{
+  "model_only_on_fpga_flash": true,
+  "region_base": 1310720,
+  "region_bytes": 816656,
+  "entries": [
+    {
+      "name": "weights",
+      "address": 1314816,
+      "bytes": 308496,
+      "crc32": 3388694345,
+      "sha256": "8e43eae5bc0f40a9879f78b6b702c8f8e154eab4c2162181bd61ae3ccea58b68"
+    },
+    {
+      "name": "1024x600",
+      "address": 1623312,
+      "bytes": 117888,
+      "crc32": 3237296641,
+      "sha256": "30468f01be07e7e154a40ca6b00e1472f06df726c1ba441f25d3de5ed6ca9154"
+    },
+    {
+      "name": "1920x1080",
+      "address": 1741200,
+      "bytes": 366720,
+      "crc32": 1988155149,
+      "sha256": "feca2517c773bea79a432dd81de28631383b3f6ed5f1d73ecfd94ef8affd71e5"
+    },
+    {
+      "name": "256x224",
+      "address": 2107920,
+      "bytes": 19456,
+      "crc32": 3748291448,
+      "sha256": "b696d85abddd17df700d090bbafe215f0d367b84396c2dcba42e997b600fcdf4"
+    }
+  ],
+  "header_version": 2,
+  "hardware_tested": false,
+  "tile_halo": 96,
+  "joint_profile": "multiband"
+}

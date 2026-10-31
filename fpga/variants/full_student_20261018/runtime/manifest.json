@@ -1,0 +1,163 @@
+{
+  "abi": "shared-int16-three-heads-20261020",
+  "conv_relu_fused": true,
+  "minimum_runtime_id": 249,
+  "parameters": 149285,
+  "active_convolutions": 36,
+  "checkpoint_sha256": "7b6fd7afde599fef033a851a5373d587845a8911016c3c4c54d703ef8609a6b7",
+  "feature_fraction": 10,
+  "weights": {
+    "file": "weights.payload.bin",
+    "bytes": 308496,
+    "crc32": 3388694345,
+    "sha256": "8e43eae5bc0f40a9879f78b6b702c8f8e154eab4c2162181bd61ae3ccea58b68",
+    "address": 50331648
+  },
+  "programs": {
+    "1024x600": {
+      "commands": 921,
+      "model_only_commands": 846,
+      "output_addresses": [
+        79691776,
+        92274688,
+        104857600
+      ],
+      "peak_scratch_bytes": 31868928,
+      "frame_input_address": 67108864,
+      "ddr_exclusive_limit": 134217728,
+      "tile_body": [
+        256,
+        224
+      ],
+      "tile_halo": 96,
+      "program_bytes": 117888,
+      "scratch_ranges": [
+        [
+          37748736,
+          50331648
+        ],
+        [
+          117440512,
+          134217728
+        ],
+        [
+          51380224,
+          60817408
+        ],
+        [
+          62914560,
+          67108864
+        ]
+      ],
+      "moire_frontend": false,
+      "residual_scale": 1.0,
+      "joint_profile": "multiband",
+      "file": "program_1024x600.bin",
+      "bytes": 117888,
+      "crc32": 3237296641,
+      "sha256": "30468f01be07e7e154a40ca6b00e1472f06df726c1ba441f25d3de5ed6ca9154",
+      "address": 60817408,
+      "pixels": 614400,
+      "width": 1024,
+      "height": 600
+    },
+    "1920x1080": {
+      "commands": 2865,
+      "model_only_commands": 2790,
+      "output_addresses": [
+        79691776,
+        92274688,
+        104857600
+      ],
+      "peak_scratch_bytes": 31868928,
+      "frame_input_address": 67108864,
+      "ddr_exclusive_limit": 134217728,
+      "tile_body": [
+        256,
+        224
+      ],
+      "tile_halo": 96,
+      "program_bytes": 366720,
+      "scratch_ranges": [
+        [
+          37748736,
+          50331648
+        ],
+        [
+          117440512,
+          134217728
+        ],
+        [
+          51380224,
+          60817408
+        ],
+        [
+          62914560,
+          67108864
+        ]
+      ],
+      "moire_frontend": false,
+      "residual_scale": 1.0,
+      "joint_profile": "multiband",
+      "file": "program_1920x1080.bin",
+      "bytes": 366720,
+      "crc32": 1988155149,
+      "sha256": "feca2517c773bea79a432dd81de28631383b3f6ed5f1d73ecfd94ef8affd71e5",
+      "address": 60817408,
+      "pixels": 2073600,
+      "width": 1920,
+      "height": 1080
+    },
+    "256x224": {
+      "commands": 152,
+      "model_only_commands": 77,
+      "output_addresses": [
+        79691776,
+        92274688,
+        104857600
+      ],
+      "peak_scratch_bytes": 31868928,
+      "frame_input_address": 67108864,
+      "ddr_exclusive_limit": 134217728,
+      "tile_body": [
+        256,
+        224
+      ],
+      "tile_halo": 96,
+      "program_bytes": 19456,
+      "file": "program_256x224.bin",
+      "width": 256,
+      "height": 224,
+      "bytes": 19456,
+      "crc32": 3748291448,
+      "sha256": "b696d85abddd17df700d090bbafe215f0d367b84396c2dcba42e997b600fcdf4",
+      "address": 60817408,
+      "pixels": 57344,
+      "scratch_ranges": [
+        [
+          37748736,
+          50331648
+        ],
+        [
+          117440512,
+          134217728
+        ],
+        [
+          51380224,
+          60817408
+        ],
+        [
+          62914560,
+          67108864
+        ]
+      ],
+      "joint_profile": "multiband",
+      "tiles": 1
+    }
+  },
+  "operator_firmware": "FPGA DSP transform with CPU fallback; resize scale log2 1..5",
+  "quality_approved": false,
+  "hardware_tested": false,
+  "fixed_size_abi": 2,
+  "unreleased": true
+}

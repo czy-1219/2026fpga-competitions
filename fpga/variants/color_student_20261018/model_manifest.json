@@ -1,0 +1,30 @@
+{
+  "checkpoint_sha256": "bbcadfdad56033b411340ab4df344409209fac4f5e33e70012b13a7a093911c2",
+  "parameters": 7459,
+  "receptive_field": 9,
+  "tile": 16,
+  "body": 8,
+  "halo": 4,
+  "color_residual_zero": 0,
+  "old_residual_zero": -124,
+  "input_scale": 0.003921568859368563,
+  "output_scale": 0.005710300523787737,
+  "output_q16": 95429,
+  "edge_threshold": {
+    "dark": 128,
+    "bright": 160,
+    "residual_limit": 8,
+    "luma": "(R+2G+B+2)>>2",
+    "neighbors": "center,left,right,up,down; replicate image boundary"
+  },
+  "roms": {
+    "color_parameters.vh": "a13355ce80096336311cde3ed9549bdfe83a2d13317394afe02757de6cf5fefe",
+    "weights_0.mem": "ea872b3f7021063045ce34d625287c4a5c56dbbefc003c68480c05a8645a9027",
+    "weights_1.mem": "191f76f42a602b8074eed38b4e33b0f4c8518e5bd3b0da7ee3cd65ef66ebf888",
+    "weights_2.mem": "e1a825762a4c87e8d8e94aae2a35a7ad8af71da77e48eea6662b9b358ae65a92",
+    "weights_3.mem": "ab93f98881eab5419cb08f56f58fded3c8a2a6516c21f131d100a7a4058638f1",
+    "weights_4.mem": "4834c44f0bd08e61e29642d03cac7625323e5d1c107abac97aeaf7fd19a36868"
+  },
+  "vectors": 22,
+  "board_tested": false
+}

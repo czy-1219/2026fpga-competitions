@@ -1,0 +1,102 @@
+/* Phone-first presentation, including a phone-width preview on a desktop. */
+html{background:#e9ede9;scroll-padding-bottom:110px}
+body{max-width:520px!important;min-height:100dvh;padding:20px 16px 110px!important;background:#f5f7f4!important;font-size:15px!important;box-shadow:0 0 0 1px #dce3de}
+body h1{font-size:24px!important;line-height:1.35;margin:0 0 16px!important;letter-spacing:-.4px}
+body h2{font-size:16px!important}
+body .preview-banner{margin:0 0 18px;padding-bottom:14px;gap:8px;flex-wrap:wrap}
+body .preview-banner b{font-size:12px;letter-spacing:1px}
+body .preview-tag{font-size:11px;padding:3px 8px}
+body nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));width:100%;gap:2px!important;margin:0 0 20px!important;padding:4px!important}
+body nav a{display:flex;align-items:center;justify-content:center;min-height:44px;padding:6px 2px!important;font-size:12px!important;white-space:nowrap}
+body button,body select,body input:not([type=checkbox]):not([type=range]){min-height:44px;font-size:16px!important;touch-action:manipulation}
+body select{max-width:65%!important;min-width:0}
+body input[type=checkbox]{width:20px;height:20px;flex-shrink:0}
+body input[type=file]{min-height:72px;padding:14px 10px;font-size:14px!important}
+body input::file-selector-button{padding:10px 12px;font-size:14px;margin-right:8px}
+body .workspace{display:block}
+body .workspace aside{display:block}
+body .panel{padding:18px 16px!important;margin:0 0 14px!important;border-radius:10px!important}
+body .workspace aside label{min-height:44px;gap:8px;margin:10px 0;font-size:14px}
+body .workspace aside .toolbar{display:grid;grid-template-columns:1fr 1fr}
+body .workspace aside .toolbar button{font-size:14px!important;padding:9px 4px!important}
+body .workspace aside .advanced-options label{flex-wrap:wrap;align-items:center}
+body .note,body .workspace aside p.note{font-size:13px!important;line-height:1.7}
+body summary{min-height:44px;align-content:center;font-size:14px!important}
+body .advanced-options{padding-top:6px;margin-top:12px}
+body #status{margin:16px 0 12px;padding:12px 14px!important;font-size:14px!important;border-radius:0 6px 6px 0}
+body #taskProgressLabel{font-size:13px}
+body progress{appearance:none;border:none;border-radius:4px;background:#e0e6df;height:6px!important;margin:8px 0 20px!important;overflow:hidden}
+body progress::-webkit-progress-bar{background:#e0e6df;border-radius:4px}
+body progress::-webkit-progress-value{background:#557861;border-radius:4px}
+body .images{display:block!important;margin-bottom:14px}
+body .images>section{padding:12px;border-radius:0 0 9px 9px}
+body .images>section>h2{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+body .images>section:has(canvas[width='0'])::after{min-height:180px;font-size:14px}
+body .images>section:first-child:has(canvas[width='0'])::after{content:'选择图片后，在这里查看原图'}
+body .images>section:last-child:has(canvas[width='0'])::after{content:'处理完成后，在这里查看结果'}
+body .images canvas{max-height:none!important;object-fit:contain}
+body .image-tabs{display:grid;grid-template-columns:1fr 1fr;padding:4px;background:#e9eeea;border-radius:8px 8px 0 0;gap:4px}
+body .image-tabs button{border:0!important;background:transparent!important;font-size:14px!important;min-height:44px}
+body .image-tabs button[aria-selected=true]{background:white!important;color:#2c513b!important;font-weight:600}
+body .phone-downloads .toolbar{display:grid;grid-template-columns:1fr 1fr;margin-bottom:0!important}
+body .phone-downloads button{padding:9px 8px!important;font-size:13px!important;min-height:48px;line-height:1.5}
+body .phone-downloads #compareFpga{grid-column:1/-1}
+body .phone-help{border-top:1px solid var(--line);margin-top:14px;padding-top:4px}
+body .preview-timing{display:grid;grid-template-columns:1fr;gap:10px;margin:8px 0!important}
+body .preview-timing span{display:flex;justify-content:space-between}
+body .phone-actions{position:fixed;z-index:20;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,520px);display:grid;grid-template-columns:1.45fr 1fr 1fr;gap:8px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid #d8e0d7;background:#fafcf9;box-shadow:0 -4px 20px #263a2c08}
+body .phone-actions button{width:100%;min-height:48px;padding:8px 4px!important;font-size:14px!important;margin:0;line-height:1.3}
+body .phone-actions #run{font-size:15px!important;min-height:48px;padding:8px 4px!important}
+body footer{font-size:11px;line-height:1.8;margin-top:20px;padding-top:14px}
+@media(max-width:360px){body{padding-left:12px!important;padding-right:12px!important}body nav a{font-size:13px!important}body .panel{padding:16px 12px!important}body .phone-actions{padding-left:12px;padding-right:12px;gap:6px}}
+
+/* Shared structure for camera, local, model and portrait workflows. */
+[hidden]{display:none!important}
+body nav{display:grid!important}
+body nav a.active,body nav a[aria-current=page]{background:#fff!important;color:#2c513b!important;box-shadow:0 1px 3px #233d2510}
+body main{max-width:100%;margin:0;padding:0!important}
+body .mode-description{font-size:13px;color:var(--muted);margin:-6px 0 20px!important}
+body .step-heading{margin:0 0 14px!important;font-weight:650}
+body article>.step-heading{margin-top:22px!important}
+body .group,body .modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px!important;width:100%}
+body .group button,body .modes button{margin:0!important;min-width:0;font-size:14px!important;padding:9px 6px!important}
+body #resolutions>span{display:none}
+body #resolutions button:last-child{grid-column:1/-1}
+body .field{display:block!important;width:100%;margin:0!important}
+body .toolbar>.field{grid-column:1/-1}
+body .field-label{font-size:13px;color:var(--muted);margin:14px 0 8px!important}
+body .head{font-size:12px;color:var(--muted);flex-wrap:wrap;margin-top:14px}
+body .head span{overflow-wrap:anywhere}
+body details{border-color:var(--line)}
+body details:not(.panel) .toolbar{display:flex!important;align-items:flex-start}
+body details .toolbar>label{width:100%;justify-content:flex-start!important;line-height:1.5}
+body details small{font-size:12px;color:var(--muted)}
+body label:has(#brightness){display:flex;flex-wrap:wrap;justify-content:flex-start!important}
+body #brightnessState{width:100%;font-size:12px;color:var(--muted)}
+body #progressLabel{color:var(--muted)}
+body .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+body .controls>span,body .controls>label{grid-column:1/-1}
+body .controls button{font-size:14px!important;padding:8px!important;margin:0!important}
+body .controls label{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+body .brush-options{margin-top:14px!important}
+body canvas.preview-empty{display:none!important}
+body .empty-image{display:grid;place-items:center;min-height:180px;padding:16px;background:#f7f9f6;border:1px dashed #dce4db;border-radius:5px;color:#84918a;font-size:13px;text-align:center}
+body .phone-actions button.primary,body .phone-actions #capture,body .phone-actions #process,body .phone-actions #run{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important}
+body .images canvas{background:#f7f9f6}
+body[data-page=portrait] #result{background:repeating-conic-gradient(#f0f2ef 0 25%,#d9dfd9 0 50%) 0/16px 16px}
+
+.image-comparison canvas{width:100%;height:auto;border-radius:8px}.image-comparison label{display:flex;align-items:center;gap:12px}.image-comparison input{flex:1;accent-color:#456d62}
+
+.upload-options{display:grid;gap:10px}.upload-options label{display:grid;gap:6px}.upload-options select{width:100%;min-height:42px}.upload-crop canvas{width:100%;height:auto}.upload-crop #studentCropPanel{padding:0;border:0;box-shadow:none}
+
+body .result-card{margin-top:18px!important;background:#fff!important}
+body .result-card>.panel,body .result-card>.images,body .result-card>.image-tabs{box-shadow:none!important}
+body .result-card>.panel{border:0!important;border-top:1px solid var(--line)!important;border-radius:0!important;margin:18px 0 0!important;padding:16px 0 0!important;background:transparent!important}
+body .result-card .images{border:0!important;padding:0!important;background:transparent!important}
+body .result-card h3{font-size:15px;margin:0 0 12px}
+body .screen-settings label{display:flex;gap:10px;flex-wrap:wrap}
+body .screen-settings small{display:block;margin:8px 0}
+body .scan-options{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
+body .scan-options label{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+/* V8 crop entry: two balanced rows retain 44px targets on narrow screens. */

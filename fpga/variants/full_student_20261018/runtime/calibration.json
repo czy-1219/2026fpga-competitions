@@ -1,0 +1,58 @@
+{
+  "conv_abs_maxima": {
+    "features.0.0": 1.4424538612365723,
+    "features.0.2": 1.58920419216156,
+    "features.0.4": 2.490349054336548,
+    "features.0.6": 2.2003746032714844,
+    "features.1.0": 1.5819621086120605,
+    "features.1.2": 0.7600989937782288,
+    "features.1.4": 0.656404435634613,
+    "features.1.6": 1.196336030960083,
+    "features.2.0": 1.4141970872879028,
+    "features.2.2": 1.1667693853378296,
+    "features.2.4": 0.9763942360877991,
+    "features.2.6": 0.5838887691497803,
+    "features.3.0": 1.0162168741226196,
+    "features.3.2": 0.5110010504722595,
+    "features.3.4": 0.2881665527820587,
+    "features.3.6": 0.6419962644577026,
+    "fusions.2": 0.12148786336183548,
+    "fusions.1": 0.2038183957338333,
+    "fusions.0": 0.2136102020740509,
+    "color.0": 0.6585344672203064,
+    "color.1": 0.15682436525821686,
+    "color.2": 0.019138215109705925,
+    "color.3": 0.13803493976593018,
+    "color_refine.0": 3.8135499954223633,
+    "color_refine.2": 3.3505263328552246,
+    "color_refine.4": 0.6465249061584473,
+    "color_refine_coarse.1": 1.2603951692581177,
+    "color_refine_coarse.3": 0.523819088935852,
+    "color_refine_coarse.5": 0.04086528718471527,
+    "gray.0": 2.742230176925659,
+    "gray.2": 0.656295120716095,
+    "text.0": 5.149930477142334,
+    "text.2": 0.811039388179779,
+    "text_detail.0": 1.8830922842025757,
+    "text_detail.2": 1.3696516752243042,
+    "text_detail.4": 0.2190283238887787
+  },
+  "global_feature_fraction": 10,
+  "guard_range_multiplier": 4,
+  "examples": [
+    {
+      "path": "runs\\document_detail_coarse_r2_review_20261020\\000\\input.jpg",
+      "sha256": "f7ed854313c37bc98f49e245c32bb58313757a0c6a6f5ddbdbe92db7c7f84355"
+    },
+    {
+      "path": "runs\\document_detail_coarse_r2_review_20261020\\001\\input.jpg",
+      "sha256": "8992fc89174c0983fde93243f123f226d13e2ade90f3031240622ffbda5cf82d"
+    },
+    {
+      "path": "runs\\document_detail_coarse_r2_review_20261020\\017\\input.jpg",
+      "sha256": "9e739b096ee5ccdd1cb70ee14f61d8dab95d1bb86ad1ec661d266405b006b75f"
+    }
+  ],
+  "synthetic_examples": 3,
+  "calibration_is_not_quality_validation": true
+}

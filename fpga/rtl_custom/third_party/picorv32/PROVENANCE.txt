@@ -1,0 +1,9 @@
+Upstream: https://github.com/YosysHQ/picorv32
+File: https://raw.githubusercontent.com/YosysHQ/picorv32/main/picorv32.v
+Retrieved: 2026-10-18
+SHA256: 0836050971b3c6cdd28ac3b1e5719a67fb645161912bef1e472e63995ceb0622
+License: ISC; see COPYING (kept verbatim).
+The upstream file is unmodified. The production wrapper enables RV32IM,
+uses local block RAM for instructions and an external upstream PCPI fast
+multiplier with EXTRA_MUL_FFS=1, EXTRA_INSN_FFS=0. Image operations execute
+inside the FPGA. This CPU does not control or replace the ESP32 firmware.
