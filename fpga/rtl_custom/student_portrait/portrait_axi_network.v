@@ -39,7 +39,13 @@ module portrait_axi_network (
     wire [7:0] read_data,write_data;
     wire engine_done,engine_error,engine_ready,mem_fault,mem_idle,fence_done;
     wire [4:0] engine_stage;
-    wire core_reset=rst_n_i && (state==START || state==RUN || state==FENCE);
+    // Registered reset release stays stable when START changes to RUN.
+    reg core_reset;
+    always @(posedge clk_i or negedge rst_n_i) begin
+        if (!rst_n_i) core_reset <= 1'b0;
+        else if (state == IDLE) core_reset <= start_i;
+        else if (next_state == ABORT || next_state == IDLE) core_reset <= 1'b0;
+    end
     assign ready_o=rst_n_i && state==IDLE;
     assign done_o=done;assign error_o=error;
     assign stage_o=stage;

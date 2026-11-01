@@ -1,72 +1,171 @@
-# Ti60 FPGA / ESP32 工程与烧录固件
+# 基于 Ti60 FPGA 的屏摄图像增强与文档处理系统
 
-版本保持 **V8.1.1 / F9-V8-1031-SPI**。本包只包含 ESP32 源码、FPGA 工程源码及配套烧录固件。测试、日志、验证报告、GitHub 辅助文档和重复源码包不在包内。
+> 2026 全国大学生嵌入式芯片与系统设计竞赛 · FPGA 创新设计赛道 · 易灵思平台
+>
+> 硬件：VF-Ti60F225 + OV5640 + ESP32 ｜ 工程版本：V8.1.1 ｜ ESP32 固件标识：F9-V8-1031-SPI
 
-## 目录及入口
+## 作品简介
 
-| 目录或文件 | 用途 |
+拍摄投影、显示屏和纸质资料时，图像常出现摩尔纹、明暗不均、偏色和文字边缘不清等问题。本作品围绕课堂课件记录、会议屏摄和文档采集，设计了一套集图像采集、板端处理、无线交互和结果导出于一体的图像处理系统。
+
+系统以 Ti60 FPGA 为计算与存储中心，既可以采集板载 OV5640 摄像头画面，也可以接收手机、电脑上传的图片。用户通过浏览器选择原图、灰阶、扫描文档、彩色增强或模型处理流程，查看处理结果并下载保存。系统另集成人像提取和视频调焦入口。
+
+FPGA 承担图像数据通路、DDR 帧缓存、传统图像处理、定点模型计算和 JPEG 编解码等核心工作。ESP32 提供 Wi-Fi、HTTP 网页和 SPI 桥接；浏览器完成文件选择、交互展示及明确区分的图像后处理。模型主计算在 FPGA 板端执行，无需云端推理服务。
+
+## 赛事要求与作品设计的对应关系
+
+易灵思选题指南强调系统完整性、FPGA 的核心作用、架构与关键技术说明，以及可核查的实现指标。[指南原件（公开镜像）](https://github.com/nbstarhkc/Qian-Sai/blob/main/sources/efinix.pdf)第 18–20 页介绍了开放创新设计的要求；正式提交口径以[竞赛官网](https://www.fpgachina.cn/)及所报名赛题的最新通知为准。本仓库不将尚未确认的具体赛题编号写作报名信息。
+
+| 需要说明的问题 | 本作品的设计与评审入口 |
 | --- | --- |
-| `esp32/esp32_fpga_spi_bridge/esp32_fpga_spi_bridge.ino` | ESP32 Arduino 主程序入口 |
-| `esp32/esp32_fpga_spi_bridge/*.h` | SPI/HTTP、模型装载、人像、任务、结果缓存和网页资源等配套源码 |
-| `esp32/esp32_fpga_spi_bridge/partitions.csv` | ESP32 Flash 分区表，需随 Arduino 工程保留 |
-| `esp32/web_sources/` | 网页 JavaScript 原始源码及部分样式/页面构建输入；直接编译使用 Arduino 目录中已有的网页资源头文件 |
-| `fpga/Ti60_Demo_frame_ddr.xml` | Efinity FPGA 工程入口，顶层为 `example_top` |
-| `fpga/Ti60_Demo.peri.xml` | 外设、引脚配置 |
-| `fpga/Ti60_Demo.pt.sdc` | 时序约束 |
-| `fpga/src/` | 摄像头、DDR、显示、AXI 等板级 RTL |
-| `fpga/rtl_custom/` | JPEG、图像处理、模型运算、通信及第三方 RTL |
-| `fpga/ip/` | Efinity IP 源码、配置、模板和工具元数据 |
-| `fpga/variants/frame_ddr_20261011/` | 当前顶层与整帧处理、人像、SPI 等集成模块 |
-| `fpga/variants/full_student_20261018/firmware/` | FPGA 内 RISC-V 程序的 C/汇编、链接脚本和 RAM 初始化文件；不是 ESP32 固件 |
-| `fpga/variants/full_student_20261018/runtime/` | 模型权重、各尺寸运行程序、Flash 模型区及元数据 |
-| `fpga/variants/` 其余目录 | 现有工程使用的辅助模块、参数和初始化文件，保持目录关系 |
-| `fpga/pc_tools/prepare_project_paths.py` | 换电脑或目录后更新 IP 配置中的本机基准路径 |
-| `firmware/esp32/` | ESP32 应用、引导和分区烧录文件 |
-| `firmware/fpga/` | 包含 FPGA 配置和模型数据的 Flash 镜像 |
+| 解决什么实际问题 | 面向屏摄与文档采集，改善纹理干扰、照明和可读性，并提供原图对照 |
+| FPGA 承担什么核心功能 | 采集与缓存调度、图像处理、定点模型运算、JPEG 编解码和数据搬运 |
+| 如何形成完整系统 | 摄像头或本地图片输入，经板端处理后，在网页查看、对比并导出 |
+| 如何进行软硬件分工 | FPGA 计算与存储，ESP32 通信，浏览器交互及后处理，分工见下文 |
+| 相比基础例程新增了什么 | 从摄像头/DDR/显示基础工程扩展为双输入、多处理流程、模型运算与无线结果回传系统 |
+| 实现效果如何核查 | 用同一输入对照原图和结果；资源与时序单独列明，不以构建通过替代实板性能数据 |
 
-## 编译
 
-**FPGA：**工程记录环境为 Efinity 2025.2.288.3.8，器件 Ti60F225、C4。换目录后在包根目录执行：
+## 主要功能与使用场景
+
+| 功能 | 使用方式与输出 |
+| --- | --- |
+| 摄像头抓拍 | 选择 720p、1080p 或 720p 预览/1080p 抓拍；720p 档实际导出为 **1024×600**，1080p 档导出为 **1920×1080** |
+| 本地图片处理 | 上传已有屏摄或文档图片，按 **256×224、1024×600、1920×1080** 三档尺寸处理 |
+| 传统图像处理 | 提供原图、灰阶、扫描文档和彩色增强，可组合灰阶曲线、色度平滑、中值去噪等选项 |
+| 模型与联合处理 | 在 FPGA 中执行共享模型，选择彩色、灰阶或文字输出；联合流程衔接传统处理 |
+| 原图与结果对照 | 保留任务身份与校验信息，支持下载、继续读取及浏览器内对比 |
+| 人像提取 | FPGA 推理产生 64×64 掩码，浏览器按原图分辨率合成透明背景结果，并提供边缘修整；当前修复状态见下文 |
+| 视频调焦 | 提供 512×300 预览入口，辅助摄像头位置与清晰度调整 |
+
+三档尺寸是本地图片/整帧处理尺寸，并不表示人像网络按这些尺寸直接推理。摄像头采集档位、板端处理尺寸和最终导出尺寸也分别定义。
+
+## 系统架构
+
+```mermaid
+flowchart LR
+    Camera[OV5640 摄像头] --> Capture[FPGA 采集与格式整理]
+    Browser[手机 / 电脑浏览器] <-->|Wi-Fi / HTTP| ESP[ESP32 网页与通信]
+    ESP <-->|SPI 命令与图像数据| FPGA[Ti60 FPGA]
+    Capture --> DDR[DDR3 帧缓存]
+    FPGA <--> DDR
+    DDR <--> Traditional[传统图像处理]
+    DDR <--> Model[定点模型运算]
+    DDR <--> JPEG[JPEG 编解码与回传]
+    DDR --> Display[板载显示链路]
+    JPEG <--> FPGA
+```
+
+### FPGA 计算与存储
+
+摄像头数据进入采集通路后写入 DDR；上传图片通过 SPI 接收并进入解码和帧缓存路径。处理模块按任务选择输入、输出地址和尺寸，通过共享内存接口读取原图并写回结果。JPEG 通路负责压缩回传，降低浏览器获取图像时的数据量。
+
+模型通路使用定点数据和片上计算资源。共享整帧模型将卷积计算与非卷积操作分工：专用运算模块执行主要卷积，FPGA 内 PicoRV32 处理器运行配套整数程序完成部分非卷积任务。这里使用的是第三方处理器核，作品工作集中在计算模块、程序、存储访问和整机集成，不宣称自研 RISC-V 核。
+
+### ESP32 通信与任务管理
+
+ESP32 管理设备热点、网页请求、SPI 控制和数据传输，提供任务查询、输入/结果校验和断线后的继续读取能力。人像输入采用分批装载，使数据发送期间仍可响应状态查询。
+
+### 浏览器交互与后处理
+
+浏览器负责图片加载、尺寸适配、控制设置、结果显示和下载，并执行网页中启用的文档几何、人像掩码清理等后处理。应区分 FPGA 原始结果和浏览器最终显示结果，不能将全部显示效果归因于 FPGA。
+
+页面共享资源采用内容哈希缓存，导航时提供过渡状态；720p 导出尺寸说明位于分辨率按钮下方。
+
+## 设计特点
+
+1. **采集和上传共用处理系统。** 摄像头抓拍与本地图片接入相同的板端处理和回传机制，便于同一素材复现对照。
+2. **传统算法与模型分工。** 传统处理负责可控的局部增强与文档收尾，模型提供学习得到的特征变换，并允许组合为联合流程。
+3. **面向 FPGA 的整数计算。** 通过定点表示、专用计算模块及板内处理器协同，组织模型运算和 DDR 数据访问。
+4. **无线交互和结果完整性。** 手机无需安装专用应用，通过热点访问设备；回传保留任务身份、长度及 CRC 检查。
+
+这些是架构与工程实现特点，不等同于已取得性能领先、识别精度或去纹率的量化结论。
+
+## 实现数据与当前验证状态
+
+以下资源与时序来自当前人像复位修改对应的 Efinity 构建，不与早期版本的数据混用。
+
+| 指标 | 当前记录 |
+| --- | --- |
+| 器件 | Efinix Ti60F225，C4 时序模型 |
+| 系统时钟约束 | 96 MHz；不能将该值写作测得的模型帧率 |
+| XLR | 58,824 / 60,800，约 96.75% |
+| 存储块 | 243 / 256 |
+| DSP | 117 / 160 |
+| 布线冲突 | 最终为 0，已生成配置位流 |
+| 最差建立余量 | **-0.677 ns，静态时序尚未闭合** |
+| 最差保持余量 | 0.014 ns |
+| 端到端耗时、吞吐和功耗 | 本仓库未提供可复核的统一实测统计，不列估算值 |
+
+当前已知状态：
+
+- 用户反馈 256×224 本地图片和模型路径可用；这不替代全部模式的系统测试。
+- 人像曾出现输入装载完成、网络阶段停在 1/25 的实板问题。当前 RTL 将核心内部复位改为寄存器输出，以消除组合译码毛刺风险；状态位偏斜注入、启动、错误排空与任务恢复仿真通过，**修改后的实板人像效果仍待确认**。
+- 当前 FPGA 已完成综合、布局布线和镜像生成，但静态时序未闭合；严格源码交付检查也未全部通过，尚不能标记为正式验收通过。
+- 网页导航与资源缓存经过本地浏览器模拟测试，ESP32 应用编译通过；模拟设备结果不代表实际热点下的实测跳转耗时。
+
+本仓库保留可构建源码和配套运行数据；训练数据及训练、量化导出的完整工具链不在本次提交范围内。评审报告中的效果、速度及稳定性结论应使用最终实板测量结果。
+
+## 复现与演示
+
+### 1. 准备硬件与工具
+
+使用 VF-Ti60F225 开发板、OV5640 DVP 摄像头、ESP32，以及工程所配套的显示与供电连接。接线按板卡原理图、工程外设配置和 ESP32 主程序中的引脚定义核对。
+
+FPGA 使用 Efinity **2025.2.288.3.8**；ESP32 使用 Arduino ESP32 Core **3.1.1**，开发板选择 ESP32 Dev Module，FQBN 为 `esp32:esp32:esp32`。
+
+### 2. 烧录配套固件
+
+| 目标 | 固件入口 | Flash 地址 |
+| --- | --- | --- |
+| ESP32 引导程序 | [bootloader.bin](firmware/esp32/bootloader.bin) | `0x1000` |
+| ESP32 分区表 | [partitions.bin](firmware/esp32/partitions.bin) | `0x8000` |
+| ESP32 应用 | [application.bin](firmware/esp32/application.bin) | `0x10000` |
+| FPGA 配置 Flash | [完整 BIN](firmware/fpga/fpga_configuration_and_model.bin) 或 [原生 HEX](firmware/fpga/fpga_configuration_and_model.hex) | `0x0` |
+
+FPGA 完整 BIN 为 8 MiB，包含从 `0x140000` 起始的模型区；HEX 采用 Efinity 每行 1 字节的原生格式。已有相同引导和分区的 ESP32 可只更新应用，保留 NVS。
+
+### 3. 运行演示
+
+1. 设备上电，连接热点 **Ti60-Capture**，密码 **ti60capture**，访问 [http://192.168.4.1](http://192.168.4.1)。
+2. 在拍照页面选择采集档位和处理方式，抓拍并保存原图/结果，说明导出尺寸。
+3. 在本地图片页上传同一张屏摄或文档图，对比不同处理选项；再进入模型页对比模型与联合流程。
+4. 对比时保持输入、显示比例和裁剪区域一致，分别说明 FPGA 输出与浏览器后处理。若展示人像，须先确认当前固件已完成该功能实板复测。
+5. 下载结果并保留任务校验信息；速度测试应区分上传、板端处理、回传和网页后处理耗时。
+
+### 4. 从源码构建
+
+仓库只保留三个主要目录：`esp32/` 为通信与网页源码，`fpga/` 为硬件工程及模型运行数据，`firmware/` 为可烧录镜像。
+
+FPGA：在仓库根目录先更新 IP 路径，再用 Efinity 打开[工程入口](fpga/Ti60_Demo_frame_ddr.xml)。
 
 ```powershell
 python fpga/pc_tools/prepare_project_paths.py
 ```
 
-然后打开 `fpga/Ti60_Demo_frame_ddr.xml` 进行综合、布局布线和位流生成。工具链需自行安装。
-
-**ESP32：**使用 Arduino ESP32 Core 3.1.1、ESP32 Dev Module（FQBN `esp32:esp32:esp32`），打开 `esp32/esp32_fpga_spi_bridge/esp32_fpga_spi_bridge.ino`，保留同目录全部头文件和分区表。Arduino CLI 示例：
+ESP32：用 Arduino IDE 打开[主程序](esp32/esp32_fpga_spi_bridge/esp32_fpga_spi_bridge.ino)，保留同目录全部头文件及分区表；或运行：
 
 ```powershell
 arduino-cli compile --fqbn esp32:esp32:esp32 --build-path ./build/esp32 ./esp32/esp32_fpga_spi_bridge
 ```
 
-**FPGA 内 RISC-V 程序：**普通 FPGA 编译使用预置 `nonconv.mem`。仅修改板内 C/汇编时，才需在 Linux/WSL 安装支持 RV32IM/ILP32 的裸机 GCC，在该 `firmware` 源码目录执行：
+普通 FPGA 构建使用预置的板内程序初始化文件。只有修改板内 RISC-V 的 C/汇编程序时，才需在 Linux/WSL 使用支持 RV32IM/ILP32 的裸机 GCC 运行其 `build.sh`，随后重建 FPGA。
 
-```bash
-RISCV_TOOLCHAIN=/path/to/riscv64-unknown-elf- bash build.sh
-```
+模型权重、运行指令、ROM/RAM 初始化内容和 IP 配置必须随工程保留。网页原始源码在 `esp32/web_sources/`，设备实际加载的资源位于 Arduino 工程的头文件中；修改网页原始文件后需同步内嵌资源。
 
-前缀按实际安装填写。BIN/MEM 应与源码一起更新，再重新构建 FPGA。
+## 参考基础与许可
 
-## 烧录
+板级采集、DDR 和显示链路基于开发板配套工程扩展；JPEG、处理器核和厂商 IP 继续保留各自来源与许可。项目未将第三方代码重新声明为原创，也未擅自为整个仓库指定统一开源许可证。
 
-| 芯片 | 固件文件 | Flash 地址 |
-| --- | --- | --- |
-| ESP32 | `firmware/esp32/bootloader.bin` | `0x1000` |
-| ESP32 | `firmware/esp32/partitions.bin` | `0x8000` |
-| ESP32 | `firmware/esp32/application.bin` | `0x10000` |
-| FPGA 配置 Flash | `firmware/fpga/fpga_configuration_and_model.bin` 或同名 `.hex` | `0x0`，按所用烧录工具支持的格式选择 |
+- JPEG 解码：[Apache-2.0](fpga/rtl_custom/jpeg/decoder/LICENSE.Apache-2.0)。
+- JPEG 编码：[GPL-3.0](fpga/rtl_custom/jpeg/encoder/LICENSE.GPL-3.0)。
+- PicoRV32：[COPYING](fpga/rtl_custom/third_party/picorv32/COPYING) 与 [来源记录](fpga/rtl_custom/third_party/picorv32/PROVENANCE.txt)。
+- 板内程序所用 GCC 运行库：[版权声明](fpga/variants/full_student_20261018/firmware/GCC_RUNTIME_COPYRIGHT.txt)。
+- 原厂商代码：[署名记录](fpga/SOURCE_NOTICES.txt)。
 
-已经使用相同引导与分区的 ESP32，优先只更新 `application.bin`，保留 NVS。FPGA 镜像为 8 MiB，包含 `0x140000` 起始的模型区，不要另行覆盖该区域。
+## 赛事资料与写作参考
 
-设备热点：`Ti60-Capture`，密码：`ti60capture`；连接后浏览器访问 `http://192.168.4.1`。
-
-## 配套关系与状态
-
-ESP32 烧录应用与当前保留版本号的修复源码相配套，已编译通过；本次人像上传修复未修改 FPGA 镜像，尚未完成对应实板复测。此前用户反馈板卡运行正常；既有 FPGA 静态时序记录最差建立余量为 `-0.086 ns`，尚未完全收敛。本次目录整理未重新构建 FPGA。
-
-工程中的 `.mem`、`.hex`、模型 `.bin`、DDR IP 数据及 IP 元数据属于构建/运行依赖，不能按测试产物删除。包内提供现有模型运行数据，不提供训练数据和训练/量化导出的全流程源码。
-
-## 第三方声明
-
-只有本文件作为项目 README。源码旁的第三方许可证、来源和版权声明仍予保留：JPEG 解码 Apache-2.0、JPEG 编码 GPL-3.0、PicoRV32 的 COPYING/PROVENANCE、GCC 运行库声明及 `fpga/SOURCE_NOTICES.txt`。本次整理未为整个工程添加统一许可证。
+- [2026 易灵思选题指南原件镜像](https://github.com/nbstarhkc/Qian-Sai/blob/main/sources/efinix.pdf)：核对平台、作品架构说明与 FPGA 核心作用要求；镜像由第三方整理，正式要求以竞赛方发布为准。
+- [竞赛官网](https://www.fpgachina.cn/)：核对最新通知与提交要求。
+- [2025 FPGA-ANLU 参赛作品仓库](https://github.com/maojinxiang/FPGA-ANLU-National-First-Prize)：参考“功能—系统组成—环境—复现”的说明结构。
+- [2026 EdgeSight 参赛作品仓库](https://github.com/never-die-cold/FPGA-Alittle-Design)：参考架构、软硬件分工和验证状态的组织方式。其他赛道的专用要求不直接套用到本作品。

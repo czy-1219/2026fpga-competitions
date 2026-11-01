@@ -1,3 +1,21 @@
+// Full-page navigation keeps each page's existing task and preview lifecycle.
+(()=>{
+ document.addEventListener('click',event=>{
+  if(event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+  const link=event.target.closest?.('nav a[href]');
+  if(!link||link.hasAttribute('download')||(link.target&&link.target!=='_self'))return;
+  const target=new URL(link.href,location.href);
+  if(target.origin!==location.origin||target.hash)return;
+  if(target.pathname===location.pathname&&target.search===location.search){if(!event.defaultPrevented)event.preventDefault();return;}
+  document.documentElement.setAttribute('data-ti60-pending','');
+  clearTimeout(window.Ti60PageTimer);window.Ti60PageTimer=setTimeout(()=>window.Ti60PageReady?.(),12000);
+  // Focus preview first releases its lease through its existing click handler.
+  if(event.defaultPrevented)return;
+  window.Ti60Transfer?.abort();
+  event.preventDefault();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>location.assign(target.href)));
+ });
+})();
 // Observe the existing requests; inference and transfer still use the firmware API.
 const previewTiming={job:null,start:null,fpgaMs:null,resultMs:null,originalMs:null,configuration:null};
 const previewFetch=window.fetch.bind(window);
@@ -28,6 +46,7 @@ XMLHttpRequest.prototype.send=function(...args){
  }},{once:true});return previewXhrSend.apply(this,args);
 };
 document.addEventListener('DOMContentLoaded',async()=>{
+ try {
  const banner=document.createElement('div');banner.className='preview-banner';banner.innerHTML='<b>TI60 / 图像处理</b><span class="preview-tag">设备界面</span>';document.body.prepend(banner);
  const navLabels={'/':'拍照','/student':'模型处理','/local':'本地图片','/portrait':'人像','/focus':'视频调焦'};
  const focusLink=document.createElement('a');focusLink.href='/focus';focusLink.textContent='视频调焦';if(location.pathname==='/focus')focusLink.setAttribute('aria-current','page');document.querySelector('nav').append(focusLink);
@@ -73,6 +92,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
  installDeviceControls();
  installImageComparison();
  finalizeResultLayout();
+ } finally { window.Ti60PageReady?.(); }
 });
 
 function installImageComparison(){
@@ -150,6 +170,7 @@ function unifyPhoneWorkflow(){
  const imagePanel=(canvas,label)=>{const section=make('section');section.append(make('h2','',label),canvas);images.append(section);return section;};
  if(page==='capture'){
   source.append(make('p','note','板载摄像头 · 点击底部“开始抓拍”获取画面。'),byId('resolutions'));
+  source.append(make('p','note','720p 摄像头实际导出为 1024×600。'));
   move(settings,byId('modes'),advanced);
   move(actions,byId('capture'),byId('resume'),byId('freeze'));
   byId('resume').textContent='恢复预览';byId('freeze').textContent='冻结画面';byId('capture').textContent='开始抓拍';byId('capture').classList.add('primary');
